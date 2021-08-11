@@ -21,18 +21,10 @@ namespace uploader.Controllers
             _fileService = fileService;
         }
 
-        // GET: api/<ValuesController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<ValuesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
         }
 
         // Action which saves a new file
