@@ -19,21 +19,23 @@ namespace uploader_test
         }
 
         [Fact]
-        public void ReturnsFalseStatusWhenSizeIsZero()
+        public void ReturnsFalseStatusWhenNameIsNull()
         {
             FilePost post = new FilePost
             {
-                Size = 0,
-                Name = "Test",
+                Size = 1000,
+                Name = null,
                 Content = "asd",
                 Ext = "txt"
             };
+            _mockFileService.Setup(s => s.SizeIsCorrect(1000)).Returns(true);
+            _mockFileService.Setup(s => s.IsInList(post.Ext)).Returns(true);
             ResponseModel responseModel = _uploadsController.Post(post);
             Assert.False(responseModel.Status);
         }
 
         [Fact]
-        public void ReturnsTrueStatusWhenSizeIsBiggerThanZero()
+        public void ReturnsTrueStatusWhenNameIsNotEmpty()
         {
             
             FilePost post = new FilePost
@@ -44,6 +46,8 @@ namespace uploader_test
                 Ext = "txt"
             };
             _mockFileService.Setup(s => s.SaveFile(post)).Returns(ResponseModel.Success("Baþarýlý", ""));
+            _mockFileService.Setup(s => s.SizeIsCorrect(1000)).Returns(true);
+            _mockFileService.Setup(s => s.IsInList(post.Ext)).Returns(true);
             ResponseModel responseModel = _uploadsController.Post(post);
             Assert.True(responseModel.Status);
         }
@@ -59,7 +63,8 @@ namespace uploader_test
                 Ext = null
             };
             ResponseModel responseModel = _uploadsController.Post(post);
-
+            _mockFileService.Setup(s => s.SizeIsCorrect(1000)).Returns(true);
+            _mockFileService.Setup(s => s.IsInList(post.Ext)).Returns(true);
             Assert.False(responseModel.Status);
         }
 
@@ -74,6 +79,8 @@ namespace uploader_test
                 Ext = "txt"
             };
             _mockFileService.Setup(s => s.SaveFile(post)).Returns(ResponseModel.Success("Baþarýlý", ""));
+            _mockFileService.Setup(s => s.SizeIsCorrect(1000)).Returns(true);
+            _mockFileService.Setup(s => s.IsInList(post.Ext)).Returns(true);
             ResponseModel responseModel = _uploadsController.Post(post);
 
             Assert.True(responseModel.Status);

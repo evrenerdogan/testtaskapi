@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -23,15 +24,18 @@ namespace uploader.Services
         private FileDbContext _fileDbContext { get; set; }
         private IConfiguration _configuration { get; set; }
         private IWebHostEnvironment _environment { get; set; }
+        private IHttpContextAccessor _httpContextAccessor { get; set; }
+
         public FileService(
             FileDbContext fileDbContext, 
             IConfiguration configuration, 
-            IWebHostEnvironment environment
-            )
+            IWebHostEnvironment environment,
+            IHttpContextAccessor httpContextAccessor )
         {
             _fileDbContext = fileDbContext;
             _configuration = configuration;
             _environment = environment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -104,11 +108,13 @@ namespace uploader.Services
         // listing files grouping them by file type
         public ResponseModel ListFiles()
         {
+            var req = _httpContextAccessor.HttpContext.Request;
+            var baseurl = $"{req.Scheme}://{req.Host}";
             var r = _fileDbContext.Files.
                 Where(f => f.Ext != null).
                 Select(f => new {
                     f.Ext,
-                    f.Link,
+                    Link = Path.Combine(baseurl, f.Link),
                     Name = $"{f.Name}.{f.Ext}",
                     Size = (f.Size / 1024.0).ToString("N2") + " KB",
                     UploadedAt = f.UploadedAt.ToString("dd'/'MM'/'yyyy HH:mm")
